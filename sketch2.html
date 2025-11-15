@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sketch 2</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #ffffff;
+    }
+
+    #sketch-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      transform: scale(0.6);              /* smaller */
+      transform-origin: center center;    /* scale from centre */
+      box-shadow: 0 16px 40px rgba(0,0,0,0.14); /* slight drop shadow */
+      border-radius: 4px;                 /* optional, remove if you want sharp edges */
+    }
+  </style>
+</head>
+<body>
+
+<div id="sketch-container"></div>
+
+<script>
+//eye tracker function  from edwardjmartin on p5*js web editor https://editor.p5js.org/edwardjmartin/sketches/XbjbWuuKG
+// on-click functions taken and tinkered from  source code provided by OpenAI
+
+
+// first
+let BG          = [245, 245, 245];
+let FACE        = [0, 0, 255];
+let P1          = [255];
+let P2          = [0, 0, 255];
+let FACEBACK    = [255,190,230];
+let ACCENT1     = [255];
+let ACCENT2     = [0];
+
+// second
+let BG2         = [245, 245, 245];
+let FACE2       = [255, 0, 0];
+let P12         = [255];
+let P22         = [255, 0, 0];
+let FACEBACK2   = [252, 199, 41];
+let ACCENT12    = [255];
+let ACCENT22    = [0];
+
+let img;
+let cormo;
+let bevan;
+let irish;
+let charm;
+let six;
+let pixel;
+let bonbon;
+let alumni;
+let alumniitalic;
+let scp;
+let browItalic = false;
+let swapped = false;
+
+function preload() {
+
+  cormo = loadFont('CormorantGaramond-VariableFont_wght.ttf');
+  bevan = loadFont('Bevan-Regular.ttf');
+  irish = loadFont('IrishGrover-Regular.ttf');
+  charm = loadFont('Charm-Bold.ttf');
+  six = loadFont('SixCaps-Regular.ttf');
+  pixel = loadFont('CoralPixels-Regular.ttf');
+  bonbon = loadFont('Bonbon-Regular.ttf');
+  alumni = loadFont('alumni.ttf');
+  alumniitalic = loadFont('alumniitalic.ttf');
+  scp = loadFont('scp.ttf');
+}
+
+function setup() {
+  const canvas = createCanvas(1000, 1080);
+  canvas.parent('sketch-container');
+  angleMode(DEGREES);
+}
+
+function draw() {
+  background(BG);
+
+  drawShapes();
+
+  push();
+  scale(0.3, 0.3);
+  pop();
+
+  push();
+  scale(1.15, 1.5);
+  translate(50, -40);
+  drawCard();
+  pop();
+
+  push();
+  scale(0.38);
+  translate(890, 60);
+  drawEmblem();
+  pop();
+
+  drawFace();
+
+  push();
+  scale(0.3);
+  translate(1460, 450);
+  drawEyeTracker();
+  pop();
+}
+
+function drawShapes() {
+  fill(...P1);
+  noStroke();
+  quad(220, 490, 770, 345, 770, 980, 360, 980);
+
+  fill(...P2);
+  quad(775, 90, 215, 90, 220, 490, 770, 345);
+  triangle(220, 490, 220, 980, 360, 980);
+
+  push();
+  fill(...FACEBACK);
+  stroke(...FACE);
+  strokeWeight(2);
+  rect(450, 430, 220, 220);
+  pop();
+}
+
+function drawEmblem() {
+  fill(ACCENT1);
+
+  push();
+  translate(280, 580);
+  scale(0.9, 1.5);
+  textSize(200);
+  textFont(bonbon);
+  text('l', 0, 0);
+  pop();
+
+  push();
+  translate(580, 580);
+  scale(-0.9, 1.5);
+  textSize(200);
+  textFont(bonbon);
+  text('l', 0, 0);
+  pop();
+
+  push();
+  translate(320, 310);
+  textSize(100);
+  scale(1.5, 1);
+  rotate(90);
+  textFont(bonbon);
+  text('l', 0, 0);
+  pop();
+
+  push();
+  translate(550, 310);
+  textSize(100);
+  scale(-1.5, 1);
+  rotate(90);
+  textFont(bonbon);
+  text('l', 0, 0);
+  pop();
+
+  push();
+  translate(380, 650);
+  textSize(60);
+  scale(2.1, 1);
+  textFont(bonbon);
+  text('V', 0, 0);
+  pop();
+
+  push();
+  translate(250, 660);
+  textSize(200);
+  scale(-1.4, 1);
+  rotate(-70);
+  textFont(bonbon);
+  text('l', 0, 0);
+  pop();
+
+  push();
+  translate(600, 660);
+  textSize(200);
+  scale(1.4, 1);
+  rotate(-70);
+  textFont(bonbon);
+  text('l', 0, 0);
+  pop();
+}
+
+function drawJ(x, y, rotationDeg, scaleX = 1, scaleY = 1) {
+  push();
+  fill(...ACCENT1);
+  stroke(...ACCENT1);
+  translate(x, y);
+  rotate(radians(rotationDeg));
+  scale(scaleX, scaleY);
+  textAlign(CENTER, CENTER);
+  text('J', 0, 0);
+  pop();
+}
+
+function drawVerticalI(x, yStart, count, spacing) {
+  push();
+  fill(...ACCENT1);
+  stroke(...ACCENT1);
+  translate(x, yStart);
+  textAlign(CENTER, CENTER);
+  for (let i = 0; i < count; i++) {
+    text('I', 0, i * spacing);
+  }
+  pop();
+}
+
+function drawHorizontalIRow(y, xStart, count, spacing, rotationDeg) {
+  push();
+  fill(...ACCENT1);
+  stroke(...ACCENT1);
+  textAlign(CENTER, CENTER);
+  for (let i = 0; i < count; i++) {
+    push();
+    translate(xStart + i * spacing, y);
+    rotate(90);
+    text('I', 0, 0);
+    pop();
+  }
+  pop();
+}
+
+function drawLetter(x, y, rot, char) {
+  push();
+  fill(...ACCENT1);
+  stroke(...ACCENT1);
+  translate(x, y);
+  rotate(rot);
+  text(char, 0, 0);
+  pop();
+}
+
+function drawCard() {
+  fill(ACCENT2);
+  textSize(80);
+  stroke(0, 0, 0);
+  strokeWeight(2);
+  textStyle(NORMAL);
+  textFont(alumni);
+
+  push();
+  translate(382, 235);
+  fill(ACCENT1);
+  textSize(18);
+  noStroke();
+  textFont('Times');
+  textAlign(CENTER, CENTER);
+  text('THE UNIVERSITY OF', 0, 0);
+  pop();
+
+  push();
+  translate(382, 265);
+  fill(ACCENT1);
+  textSize(28);
+  noStroke();
+  textFont('Times');
+  textStyle(BOLD);
+  textAlign(CENTER, CENTER);
+  text('MELBOURNE', 0, 0);
+  pop();
+
+  push();
+  translate(432, 510);
+  textSize(32);
+  noStroke();
+  scale(1, 0.8);
+  textFont('Times');
+  textStyle(BOLD);
+  textAlign(CENTER, CENTER);
+  text('1350811', 0, 0);
+  pop();
+
+  push();
+  translate(430, 485);
+  textSize(28);
+  scale(0.9, 0.7);
+  noStroke();
+  textFont('cormo');
+  textAlign(CENTER, CENTER);
+  text('Student ID', 0, 0);
+  pop();
+
+  push();
+  fill(...FACE);
+  translate(412, 538);
+  textSize(28);
+  scale(0.9, 0.9);
+  textFont('Times');
+  noStroke();
+  textLeading(28);
+  textAlign(CENTER, CENTER);
+  text('TESSIE', 0, 0);
+  text('GRESLEY', 0, 28);
+  pop();
+
+  push();
+  const nameLine1 = 'TESSIE';
+  const nameLine2 = 'GRESLEY';
+
+  textFont('Times');
+  textSize(28);
+  textLeading(28);
+  textAlign(CENTER, CENTER);
+
+  translate(412, 552);
+  scale(0.9, 0.9);
+
+  const lead = textLeading();
+  const baseline1Y = 0;
+  const baseline2Y = baseline1Y + lead;
+
+  const w1 = textWidth(nameLine1);
+  const w2 = textWidth(nameLine2);
+
+  stroke(...FACE);
+  strokeWeight(2);
+  line(-w1 / 2, baseline1Y - 3,  w1 / 2, baseline1Y - 3);
+  line(-w2 / 2, baseline2Y - 3,  w2 / 2, baseline2Y - 3);
+  pop();
+
+  push();
+  translate(434, 652);
+  textSize(18);
+  scale(1.23, 1);
+  textFont(irish);
+  noStroke();
+  textLeading(25);
+  textAlign(CENTER, CENTER);
+  text('21290096553724', 0, 0);
+  pop();
+
+  push();
+  translate(300, 604);
+  textSize(40);
+  scale(0.42, 1.8);
+  noStroke();
+  textFont(six);
+  textAlign(LEFT, CENTER);
+  text('II I  III   II III  I  III  II  I  II II  II  I IIII   I III I    II I   II I   III  I  II  I IIII III II   III I II', 0, 0);
+  pop();
+
+  push();
+  translate(434, 668);
+  textSize(18);
+  scale(1.2, 1);
+  textFont(charm);
+  noStroke();
+  textLeading(25);
+  textAlign(CENTER, CENTER);
+  text('Valid until 31 March 2027', 0, 0);
+  pop();
+}
+
+function mousePressed() {
+  browItalic = !browItalic;
+  swapped    = !swapped;
+
+  [BG, BG2] = [BG2, BG];
+  [FACE, FACE2] = [FACE2, FACE];
+  [P1, P12] = [P12, P1];
+  [P2, P22] = [P22, P2];
+  [ACCENT1, ACCENT12] = [ACCENT12, ACCENT1];
+  [ACCENT2, ACCENT22] = [ACCENT22, ACCENT2];
+  [FACEBACK, FACEBACK2] = [FACEBACK2, FACEBACK];
+}
+
+function drawFace() {
+  push();
+  translate(450, 422);
+  scale(0.28);
+  drawEyebrows();
+  drawNose();
+  drawLips();
+  drawEyes();
+  drawFaceOutline();
+  drawHair();
+  pop();
+}
+
+function drawEyebrows() {
+  textFont('Times');
+  textSize(150);
+  textStyle(browItalic ? ITALIC : NORMAL);
+  fill(FACE);
+  push();
+  translate(280, 280);
+  scale(-1, 1);
+  rotate(260);
+  text('j', 0, 0);
+  pop();
+  push();
+  translate(500, 280);
+  scale(1, 1);
+  rotate(260);
+  text('j', 0, 0);
+  pop();
+}
+
+function drawNose() {
+  textFont('Times');
+  textSize(60);
+  fill(FACE);
+  push();
+  translate(345, 435);
+  scale(1, 1);
+  rotate(15);
+  text('b', 0, 0);
+  pop();
+
+  push();
+  translate(440, 435);
+  scale(-1, 1);
+  rotate(15);
+  text('b', 0, 0);
+  pop();
+
+  push();
+  translate(368, 450);
+  textSize(100);
+  text('o', 0, 0);
+  pop();
+
+  push();
+  translate(378, 440);
+  textSize(70);
+  rotate(90);
+  text('c', 0, 0);
+  pop();
+
+  push();
+  translate(358, 340);
+  textSize(80);
+  scale(-1, 1);
+  rotate(170);
+  text('j', 0, 0);
+  pop();
+
+  push();
+  translate(423, 340);
+  textSize(80);
+  rotate(170);
+  text('j', 0, 0);
+  pop();
+}
+
+function drawLips() {
+  textFont('Times');
+  textSize(50);
+  push();
+  translate(370, 505);
+  text('e', 0, 0);
+  text('e', 23, 0);
+  text('e', -10, 20);
+  text('e', 33, 20);
+  textSize(70);
+  text('e', 10, 30);
+  textSize(30);
+  text('e', -20, 10);
+  text('e', 53, 10);
+  text('e', -10, -5);
+  text('e', 43, -5);
+  pop();
+
+  push();
+  translate(330, 490);
+  textStyle(ITALIC);
+  textSize(50);
+  rotate(94);
+  text('v', 0, 0);
+  pop();
+
+  push();
+  translate(455, 490);
+  textStyle(ITALIC);
+  textSize(50);
+  rotate(94);
+  scale(1, -1);
+  text('v', 0, 0);
+  pop();
+}
+
+function drawEyes() {
+  push();
+  translate(255, 315);
+  textStyle(ITALIC);
+  textSize(70);
+  rotate(94);
+  text('v', 0, 0);
+  pop();
+
+  push();
+  translate(265, 325);
+  textStyle(ITALIC);
+  textSize(40);
+  rotate(94);
+  text('v', 0, 0);
+  pop();
+
+  push();
+  translate(529, 320);
+  textStyle(ITALIC);
+  textSize(70);
+  rotate(94);
+  scale(1, -1);
+  text('v', 0, 0);
+  pop();
+
+  push();
+  translate(519, 330);
+  textStyle(ITALIC);
+  textSize(40);
+  rotate(94);
+  scale(1, -1);
+  text('v', 0, 0);
+  pop();
+
+  push();
+  translate(335, 325);
+  textStyle(ITALIC);
+  textSize(60);
+  rotate(118);
+  scale(1, -1);
+  text('f', 0, 0);
+  pop();
+
+  push();
+  translate(448, 325);
+  textStyle(ITALIC);
+  textSize(60);
+  rotate(62);
+  scale(1, 1);
+  text('f', 0, 0);
+  pop();
+
+  push();
+  translate(448, 358);
+  textSize(70);
+  scale(1.2, 1);
+  text('o', 0, 0);
+  pop();
+
+  push();
+  translate(458, 355);
+  textSize(40);
+  textStyle(ITALIC);
+  text('o', 0, 0);
+  pop();
+
+  push();
+  translate(292, 358);
+  textSize(70);
+  scale(1.2, 1);
+  text('o', 0, 0);
+  pop();
+
+  push();
+  translate(303, 355);
+  textSize(40);
+  textStyle(ITALIC);
+  text('o', 0, 0);
+  pop();
+
+  push();
+  translate(458, 358);
+  textSize(60);
+  rotate(60);
+  textStyle(ITALIC);
+  text('j', 0, 0);
+  pop();
+
+  push();
+  translate(323, 358);
+  textSize(60);
+  rotate(120);
+  scale(1, -1);
+  textStyle(ITALIC);
+  text('j', 0, 0);
+  pop();
+}
+
+function drawFaceOutline() {
+  push();
+  translate(383, 630);
+  textSize(300);
+  rotate(270);
+  textStyle(ITALIC);
+  text('r', 0, 0);
+  pop();
+
+  push();
+  translate(403, 630);
+  textSize(300);
+  rotate(270);
+  scale(1, -1);
+  textStyle(ITALIC);
+  text('r', 0, 0);
+  pop();
+
+  push();
+  translate(255, 410);
+  textSize(180);
+  rotate(-205);
+  textStyle(ITALIC);
+  text('j', 0, 0);
+  pop();
+
+  push();
+  translate(525, 410);
+  textSize(180);
+  scale(-1, 1);
+  rotate(-205);
+  textStyle(ITALIC);
+  text('j', 0, 0);
+  pop();
+}
+
+function drawHair() {
+  push();
+  translate(325, 80);
+  textSize(180);
+  rotate(-175);
+  textStyle(ITALIC);
+  text('f', 0, 0);
+  rotate(10);
+  text('f', 40, -20);
+  text('f', -10, -20);
+  text('f', 40, -60);
+  rotate(-20);
+  text('f', 100, -100);
+  text('f', 140, -200);
+  text('f', 110, -170);
+  text('f', 130, -360);
+  text('f', 140, -290);
+  text('f', 180, -320);
+  text('f', 180, -500);
+  text('f', 130, -470);
+  rotate(-10);
+  text('f', 230, -360);
+  text('f', 250, -320);
+  rotate(30);
+  text('f', 20, -520);
+  pop();
+
+  push();
+  translate(445, 80);
+  scale(-1, 1);
+  textSize(180);
+  rotate(-175);
+  textStyle(ITALIC);
+  text('f', 0, 0);
+  rotate(10);
+  text('f', 40, -20);
+  text('f', -10, -20);
+  text('f', 40, -60);
+  rotate(-20);
+  text('f', 100, -100);
+  text('f', 140, -200);
+  text('f', 110, -170);
+  text('f', 130, -360);
+  text('f', 140, -290);
+  text('f', 180, -320);
+  text('f', 150, -420);
+  text('f', 130, -470);
+  rotate(-10);
+  text('f', 300, -360);
+  text('f', 250, -320);
+  rotate(30);
+  text('f', 70, -520);
+  pop();
+
+  push();
+  translate(525, 700);
+  scale(-1, 1);
+  textSize(180);
+  rotate(-20);
+  textStyle(ITALIC);
+  text('f', 0, 0);
+  rotate(-10);
+  text('f', 10, 80);
+  rotate(-20);
+  text('f', 20, 120);
+  rotate(-20);
+  text('f', -20, 150);
+  pop();
+
+  push();
+  translate(565, 700);
+  scale(-1, 1);
+  textSize(180);
+  rotate(20);
+  textStyle(ITALIC);
+  text('f', 0, 0);
+  pop();
+
+  push();
+  translate(245, 70);
+  textSize(180);
+  rotate(50);
+  textStyle(ITALIC);
+  text('f', 0, 0);
+  text('f', 25, 40);
+  rotate(-50);
+  text('f', -70, 160);
+  pop();
+
+  push();
+  translate(525, 80);
+  textSize(180);
+  scale(-1, 1);
+  rotate(50);
+  textStyle(ITALIC);
+  text('f', 0, 0);
+  text('f', 35, 20);
+  rotate(-60);
+  text('f', -90, 150);
+  pop();
+}
+
+function drawEyeTracker() {
+  noStroke();
+  fill(255);
+  circle(200, 200, 200);
+  let xc = constrain(mouseX, 170, 230);
+  let xs = constrain(mouseY, 170, 230);
+  fill(0);
+  circle(xc, xs, 100);
+  fill(255);
+  circle(xc + 20, xs - 20, 20);
+}
+</script>
+
+</body>
+</html>

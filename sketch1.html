@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sketch 1</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #ffffff;
+    }
+
+    #sketch-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      transform: scale(0.7);              /* make it smaller */
+      transform-origin: center center;    /* scale from center */
+      box-shadow: 0 16px 40px rgba(0,0,0,0.14); /* slight drop shadow */
+      border-radius: 4px;                 /* optional – remove for sharp edges */
+    }
+  </style>
+</head>
+<body>
+
+<div id="sketch-container"></div>
+
+<script>
+// animated text cursor taken from bookworm3x4 'animated text cursor' p5.js web editor @ https://editor.p5js.org/bookworm3x4/sketches/D_E-puocB
+//star function from p5 shape library 
+//code combination donw with help from OpenAi
+
+
+const DOT_STEP  = 2;
+const DOT_MIN   = 4;
+const DOT_MAX   = 30;
+const DOT_RANGE = 200;
+const BG = [255, 255,255];
+
+let x = 300;
+let angle = 100;
+
+let gLayer;      
+let trailLayer;   
+
+let outlineMode = false;  // toggled by clicks
+
+let canvas;
+
+function setup() {
+  canvas = createCanvas(700, 700);
+  canvas.parent('sketch-container');   // put canvas inside centered div
+  pixelDensity(1);
+  background(...BG);
+  textAlign(CENTER, CENTER);
+  noCursor();
+
+  trailLayer = createGraphics(width, height);
+  trailLayer.textAlign(CENTER, CENTER);
+  trailLayer.clear(); 
+
+  gLayer = createGraphics(width, height);
+  gLayer.pixelDensity(1);
+  gLayer.textAlign(CENTER, CENTER);
+}
+
+function draw() {
+ 
+  drawT();
+
+  gLayer.clear();
+  gLayer.push();
+  drawGOn(gLayer);
+  gLayer.pop();
+
+ 
+  const snapMain = get();
+  snapMain.loadPixels();
+  gLayer.loadPixels();
+
+
+  trailLayer.push();
+  trailLayer.textAlign(CENTER, CENTER);
+  trailLayer.textFont("Helvetica");
+
+  if (outlineMode) {
+    trailLayer.noStroke();
+    trailLayer.textSize(90);
+    trailLayer.fill(255, 0, 0);  // filled color
+  } else {
+    trailLayer.textSize(50);
+    trailLayer.noFill();
+    trailLayer.stroke(0,0,255);        // outline color
+    trailLayer.strokeWeight(0.5);      // outline thickness
+  }
+
+  trailLayer.text("    t*g    ", mouseX, mouseY);
+  trailLayer.pop();
+  
+  background(...BG);
+  image(trailLayer, 0, 0);  
+
+  for (let y = 0; y < height; y += DOT_STEP) {
+    for (let xPix = 0; xPix < width; xPix += DOT_STEP) {
+      const idx = 4 * (y * width + xPix);
+      const r = snapMain.pixels[idx + 0];
+      const g = snapMain.pixels[idx + 1];
+      const b = snapMain.pixels[idx + 2];
+      const a = snapMain.pixels[idx + 3];
+      if (a < 10) continue;
+
+      if (approxEqRGB(r, g, b, BG[0], BG[1], BG[2], 3)) continue;
+
+      const d = dist(mouseX, mouseY, xPix, y);
+      const s = map(d, 0, DOT_RANGE, DOT_MAX, DOT_MIN, true);
+      fill(r, g, b);
+      ellipse(xPix, y, s, s);
+    }
+  }
+
+  for (let y = 0; y < height; y += DOT_STEP) {
+    for (let xPix = 0; xPix < width; xPix += DOT_STEP) {
+      const idx = 4 * (y * width + xPix);
+      const r = gLayer.pixels[idx + 0];
+      const g = gLayer.pixels[idx + 1];
+      const b = gLayer.pixels[idx + 2];
+      const a = gLayer.pixels[idx + 3];
+      if (a < 10) continue;
+
+      const d = dist(mouseX, mouseY, xPix, y);
+      const s = map(d, 0, DOT_RANGE, DOT_MAX, DOT_MIN, true);
+      fill(r, g, b);
+      ellipse(xPix, y, s, s);
+    }
+  }
+
+  x = (sin(angle) + 1) * 300 + 300;
+  angle++;
+}
+
+function approxEqRGB(r, g, b, R, G, B, tol = 2) {
+  return (abs(r - R) <= tol) && (abs(g - G) <= tol) && (abs(b - B) <= tol);
+}
+
+function drawT() {
+  background(...BG);
+  fill(0,0,255);
+  noStroke();
+  rect(75, 100, 550, 100);
+  rect(150, 300, 20, 20);
+  rect(150, 330, 20, 40);
+  rect(150, 390, 20, 200);
+  rect(150, 600, 20, 20);
+}
+
+function drawGOn(pg) {
+  pg.noStroke();
+  pg.fill(0, 0, 255);
+  pg.circle(250, 400, 20);
+  pg.circle(250, 360, 20);
+  starOn(pg, 250, 300, 20, 40, 6);
+
+  pg.push();
+  pg.translate(350, 400);
+  pg.rotate(radians(180));
+  pg.noFill();
+  pg.stroke(0, 0, 255);
+  pg.strokeWeight(20);
+  pg.arc(0, 0, 230, 300, radians(200), radians(340), OPEN);
+  pg.pop();
+
+  pg.push();
+  pg.fill(0, 0, 255);
+  pg.noStroke();
+  pg.textSize(200);
+  pg.textAlign(CENTER, CENTER);
+  pg.translate(400, 400);
+  pg.rotate(radians(270));
+  pg.text("T", 0, 0);
+  pg.pop();
+}
+
+function starOn(pg, x, y, radius1, radius2, npoints) {
+  const step = TWO_PI / npoints;
+  const half = step / 2.0;
+  pg.beginShape();
+  for (let a = 0; a < TWO_PI; a += step) {
+    pg.vertex(x + cos(a) * radius2,     y + sin(a) * radius2);
+    pg.vertex(x + cos(a + half) * radius1, y + sin(a + half) * radius1);
+  }
+  pg.endShape(CLOSE);
+}
+
+function mousePressed() {
+  outlineMode = !outlineMode;  // toggle each click
+}
+</script>
+
+</body>
+</html>
